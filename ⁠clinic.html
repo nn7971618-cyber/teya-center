@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عيادات TEYA | شاشة الأطباء</title>
+<style>
+:root { --teya-navy: #0e3150; --teya-gold: #f2be5c; --teya-light-gold: #fff8e7; --teya-bg: #f8fafc; --white: #ffffff; --card-shadow: 0 10px 25px rgba(14, 49, 80, 0.08); }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: var(--teya-bg); color: var(--teya-navy); padding: 20px; }
+.container { max-width: 900px; margin: 0 auto; }
+.main-header { background-color: var(--white); border-radius: 20px; padding: 20px 30px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--card-shadow); border-top: 6px solid var(--teya-gold); flex-wrap: wrap; gap: 15px;}
+.logo-section { display: flex; align-items: center; gap: 15px; }
+.logo-section img { height: 70px; width: auto; border-radius: 10px; }
+.logo-section h1 { font-size: 1.6rem; color: var(--teya-navy); font-weight: 800; }
+.queue-badge { background-color: var(--teya-navy); color: var(--teya-gold); padding: 10px 20px; border-radius: 15px; font-weight: bold; box-shadow: 0 4px 10px rgba(14, 49, 80, 0.2); }
+.btn-refresh { background-color: var(--teya-gold); color: var(--teya-navy); border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(242, 190, 92, 0.3); width: 100%; margin-bottom: 25px;}
+.patient-focus-area { background-color: var(--white); border-radius: 20px; padding: 30px; margin-bottom: 25px; box-shadow: var(--card-shadow); border: 2px solid #e2e8f0; }
+.section-header { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; color: var(--teya-navy); display: flex; align-items: center; gap: 10px; }
+.section-header::before { content: ''; width: 12px; height: 12px; background-color: var(--teya-gold); border-radius: 3px; }
+.current-card { background-color: var(--teya-light-gold); border: 2px solid var(--teya-gold); border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+.current-card .name { font-size: 1.5rem; font-weight: 800; color: var(--teya-navy); }
+.current-card .doc-name { color: #ffffff; background: var(--teya-navy); padding: 5px 10px; border-radius: 8px; font-size: 0.9rem; display: inline-block; margin-top: 10px; font-weight: bold;}
+.current-card .time { color: #ef4444; font-weight: bold; font-size: 0.9rem; margin-top: 10px; display: block;}
+.details-box { background: var(--white); padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #ddd; font-size: 0.95rem; color: #555; line-height: 1.5; }
+textarea { width: 100%; height: 100px; padding: 15px; border-radius: 12px; border: 2px solid #e2e8f0; margin: 15px 0; outline: none; resize: none; }
+.btn-finish { background-color: var(--teya-navy); color: var(--white); width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+.queue-area { background-color: var(--white); border-radius: 20px; padding: 30px; box-shadow: var(--card-shadow); }
+.queue-item { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-radius: 15px; background: #f1f5f9; margin-bottom: 15px; border-right: 5px solid var(--teya-navy); }
+.patient-info h4 { font-size: 1.2rem; font-weight: bold; }
+.patient-info p { font-size: 0.85rem; color: #64748b; margin-top: 5px; }
+.patient-info .doc-badge { background: var(--teya-gold); color: var(--teya-navy); padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8rem; margin-right: 10px;}
+.btn-call { background-color: var(--teya-gold); color: var(--teya-navy); border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+.no-data { text-align: center; color: #94a3b8; padding: 20px; font-weight: bold; }
+#errorLog { background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+<div id="errorLog"></div>
+<header class="main-header">
+<div class="logo-section">
+<img src="logo.jpg" alt="TEYA LOGO">
+<h1>سنتر TEYA لطب الأسنان</h1>
+</div>
+<div class="queue-badge" id="queueCount">الانتظار: 0</div>
+</header>
+<button class="btn-refresh" onclick="fetchData()">🔄 انقر هنا لتحديث وجلب أسماء المراجعين فوراً</button>
+<div class="patient-focus-area">
+<div class="section-header">المراجعين داخل العيادات حالياً</div>
+<div id="currentPatientArea">
+<p class="no-data">اضغط على الزر الذهبي بالأعلى لجلب البيانات...</p>
+</div>
+</div>
+<div class="queue-area">
+<div class="section-header">قائمة الانتظار العامة</div>
+<div id="waitingQueueList">
+<p class="no-data">اضغط على الزر الذهبي بالأعلى لجلب البيانات...</p>
+</div>
+</div>
+</div>
+<script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js)"></script>
+<script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js)"></script>
+<script>
+window.onerror = function(msg) {
+document.getElementById('errorLog').style.display = 'block';
+document.getElementById('errorLog').innerHTML += "خطأ بالنظام: " + msg + "
+";
+};
+const firebaseConfig = {
+apiKey: "AIzaSyCB-nA5mDW3_0t-EsX7N1RGMbzRnn2FRus",
+authDomain: "teya-center.firebaseapp.com",
+projectId: "teya-center",
+storageBucket: "teya-center.firebasestorage.app",
+messagingSenderId: "186785039764",
+appId: "1:186785039764:web:469ec4294bd814dadffb81"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const doctorsMap = {
+"doctor_1": "د. احمد",
+"doctor_2": "د. عبدالله",
+"doctor_3": "د. طه",
+"doctor_4": "د. يوسف"
+};
+function fetchData() {
+const currentArea = document.getElementById('currentPatientArea');
+const queueListDiv = document.getElementById('waitingQueueList');
+const queueCountBadge = document.getElementById('queueCount');
+currentArea.innerHTML = '<p class="no-data">جاري التحميل من السيرفر...</p>';
+queueListDiv.innerHTML = '<p class="no-data">جاري التحميل من السيرفر...</p>';
+db.collection("appointments").get().then((snapshot) => {
+queueListDiv.innerHTML = "";
+currentArea.innerHTML = "";
+let waitCount = 0;
+let currentCount = 0;
+let patientsArray = [];
+snapshot.forEach((docSnap) => {
+const data = docSnap.data();
+if(data.status === "waiting" || data.status === "current") {
+patientsArray.push({ id: docSnap.id, ...data });
+}
+});
+patientsArray.sort((a, b) => (a.appointment_time || "").localeCompare(b.appointment_time || ""));
+patientsArray.forEach((data) => {
+const id = data.id;
+const docName = doctorsMap[data.doctor_id] || "طبيب غير محدد";
+if (data.status === "current") {
+currentCount++;
+currentArea.innerHTML += ⁠<div class="current-card" id="card_${id}"> <div class="name">${data.patient_name}</div> <span class="doc-name">داخل عيادة: ${docName}</span> <span class="time">⏰ وقت الموعد: ${data.appointment_time || 'غير محدد'}</span> <div class="details-box">📄 ملاحظات الاستقبال: ${data.secretary_details || 'لا توجد ملاحظات'}</div> <label style="font-weight:bold; margin-top:15px; display:block;">تقرير الحالة:</label> <textarea id="notes_${id}" placeholder="اكتب التشخيص هنا..."></textarea> <button class="btn-finish" onclick="window.finishSession('${id}')">إكمال الجلسة للمراجع ◀</button> </div>⁠;
+} else if (data.status === "waiting") {
+waitCount++;
+const item = document.createElement('div');
+item.className = 'queue-item';
+item.innerHTML = ⁠<div class="patient-info"> <h4>${data.patient_name}</h4> <p>⏰ ${data.appointment_time || 'بدون وقت'} <span class="doc-badge">محول إلى: ${docName}</span></p> </div> <button class="btn-call" onclick="window.callPatientIn('${id}')">استدعاء</button>⁠;
+queueListDiv.appendChild(item);
+}
+});
+queueCountBadge.innerText = ⁠الانتظار: ${waitCount}⁠;
+if (currentCount === 0) currentArea.innerHTML = ⁠<p class="no-data">العيادات فارغة حالياً.</p>⁠;
+if (waitCount === 0) queueListDiv.innerHTML = ⁠<p class="no-data">لا يوجد مراجعين في قائمة الانتظار.</p>⁠;
+}).catch((error) => {
+document.getElementById('errorLog').style.display = 'block';
+document.getElementById('errorLog').innerHTML += "فشل الاتصال: " + error.message + "
+";
+});
+}
+window.callPatientIn = (id) => {
+db.collection("appointments").doc(id).update({ status: "current" }).then(() => { fetchData(); }).catch(e => alert(e.message));
+};
+window.finishSession = (id) => {
+const notesText = document.getElementById(⁠notes_${id}⁠).value;
+db.collection("appointments").doc(id).update({ status: "done", notes: notesText }).then(() => { fetchData(); }).catch(e => alert(e.message));
+};
+window.onload = fetchData;
+</script>
+</body>
+</html>
